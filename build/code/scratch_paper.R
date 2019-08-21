@@ -143,4 +143,8 @@ StrikeTreatment <- function(sampleData, earthquake, period){
 }  
 
 # Unit test
-StrikeTreatment(sample, earthquake,"Quarter")
+StrikeTreatment(fs[401:420,c("Quarter", "Lat", "Lon")], earthquake,"Quarter")
+sample <- fs[401:420,c("Quarter", "Lat", "Lon")]
+validInd <- 5:10
+sample[intersect(validInd, which(Lat<0.05)), Lon:=-1]
+sample[validInd ,  Lon:=-1]
