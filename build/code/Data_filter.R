@@ -19,7 +19,8 @@ earthquake$Quarter <- as.yearqtr(as.character(earthquake$Date), format = "%Y%m%d
 
 ## 2.Company loaction data -----
 # Load the data but drop city name
-company <- fread("company_location.csv", header = TRUE, drop = "Regplc")
+company <- fread("company_location.csv", header = TRUE)
+names(company) <- c("Stkcd","City","Lon","Lat")
 
 ## 3.CPI -----
 CPI <- fread("CPI.csv")
@@ -51,11 +52,13 @@ Income <- read.table("OpIncome.txt", header = TRUE, stringsAsFactors=FALSE)
 Income <- data.table(Income)
 
 # Keep only consolidated report and drop year beginning record
-Income <- Income[Typrep == "A" & ! grepl("/01/01",Accper),]
+Income <- Income[Typrep == "A" & ! grepl("/01/01",Accper), c("Stkcd","Accper","OpIncome")]
 
 ## 7.Propertity insurance expenses -----
 Insurance <- read.table("insurance.txt", header = TRUE, stringsAsFactors=FALSE)
 Insurance <- data.table(Insurance)
+Insurance <- Insurance[, c("Stkcd","Accper","Amount")]
+names(Insurance) <- c("Stkcd","Accper","InsuranceExp")
 
 ## 8.Dividend -----
 div <- fread("Div.csv")
