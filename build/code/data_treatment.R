@@ -74,6 +74,7 @@ fs[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
 # Run StrikeTreatment for fs
 fs[, c("Struck", "Neighbor", "Depth", "Mag")] <- StrikeTreatment(fs[,c("Quarter", "Lat", "Lon")], earthquake,"Quarter")
 
+fs[, c("MagN, MagS") := lapply(.SD, "*", Mag), .SDcol=c("Struck", "Neighbor")]
 ## Save treatment variable
 # Save data to temp
 save.image("data_treatment.RData")
