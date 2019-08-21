@@ -60,8 +60,8 @@ StrikeTreatment <- function(sampleData, earthquake, period){
     sampleData[validInd, Depth:=earthquake$Depth[minInd]]
     sampleData[validInd, Mag:=earthquake$Mag[minInd]]
     
-    sampleData[validInd & dist<=distMMI5, Struck := 1]
-    sampleData[validInd & dist>distMMI5 & dist<=distMMI1, Neighbor := 1]  
+    sampleData[intersect(validInd, which(Lat<0.05)), Struck := 1]
+    sampleData[intersect(validInd, which(dist>distMMI5 & dist<=distMMI1)), Neighbor := 1]  
   }
   return(sampleData[, c("Struck", "Neighbor", "Depth", "Mag")])
 }  
@@ -72,5 +72,8 @@ earthquake[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon
 fs[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
 
 # Run StrikeTreatment for fs
-fs[, c("Struck", "Neighbor", "Depth", "Mag"):= 
-     lapply(1:nrow(fs), function(x) StrikeTreatment(fs[x,c("Quarter", "Lat", "Lon")], earthquake,"Quarter"))]
+fs[, c("Struck", "Neighbor", "Depth", "Mag")] <- StrikeTreatment(fs[,c("Quarter", "Lat", "Lon")], earthquake,"Quarter")
+
+## Save treatment variable
+# Save data to temp
+save.image("data_treatment.RData")
