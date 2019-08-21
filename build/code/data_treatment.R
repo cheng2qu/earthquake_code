@@ -44,14 +44,12 @@ StrikeTreatment <- function(sampleData, earthquake, period){
   # Period can be either quarter or year
   
   # Initiate the treatment
-  sampleData <- fs[410:415, c("Quarter", "Lat", "Lon")]
+    sampleData[, c("Struck", "Neighbor", "Depth", "Mag"):=0]
   
-  sampleData[, c("Struck", "Neighbor", "Depth", "Mag"):=0]
-  
-  dist16Quakes <- sampleData[, lapply(1:nrow(earthquake), 
+  distList <- sampleData[, lapply(1:nrow(earthquake), 
                                       function(x) GreatCircleDist(Lon, Lat, earthquake$Lat[x],earthquake$Lon[x]))]
-  sampleData[, dist:=apply(dist16Quakes, 1, FUN=min)]
-  sampleData[, minInd:=apply(dist16Quakes, 1, FUN=which.min)]
+  sampleData[, dist:=apply(distList, 1, FUN=min)]
+  sampleData[, minInd:=apply(distList, 1, FUN=which.min)]
   
   sampleData[, distMMI5:=earthquake$MMI5[minInd]]
   sampleData[, distMMI1:=earthquake$MMI1[minInd]]
