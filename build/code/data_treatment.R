@@ -1,28 +1,87 @@
 ## Create treatment dummy for earthquake struck
 
-## 4. Mark the treatment and controlled groups
-fs$Struck <- 0
-fs$Neighbor <- 0
-fs$Depth <- 0
-fs$Mag <- 0
+## Setup -----
+# Set the working directory to access temp data
+temp_dir <- "~/R project/Code replication/build/temp"
+setwd(temp_dir)
+
+# Set link to temp data
+source_data <- "data_merged.RData"
+# Load filter data
+load(source_data)
+
+## Function to calculate great-circle distance -----
+# Preparing for function.
+GreatCircleDist <- function(LatA, LonA, LatB, LonB, R){
+  # Formula for great-circle distance
+  # With point A and B's longitude and latitude LatA, LonA, LatB, LonB
+  # The central angle: arccos(sin LatA sin LatB + cos LatA cos LatB cos |LonA - lonB|)
+  # The GC distance: R * central angle
+  
+  # Set the radius as mean earth radius
+  if (missing(R)) {
+    R = 6371
+  }
+  
+  # Check if lon and lat are measured in pi
+  if (any(abs(c(LatA, LonA, LatB, LonB)) > pi)){
+    warning("Coordinate beyond range 2*Pi")
+  }
+  
+  # Calculate central angle C
+  C=sin(LatA)*sin(LatB) + cos(LatA)*cos(LatB)*cos(abs(LonA-LonB))
+  
+  # Calculate GC dist
+  dist = R*acos(C)
+  return(dist)
+}
+
+## Function to asign treatment -----
+StrikeTreatment <- function(sampleData, earthquake, period){
+  # Calculate the dist to strikes
+  # Asign treatment group by dist comparing with MMI5 and MMI1 dists
+  
+  # Period can be either quarter or year
+  
+  # Initiate the treatment
+  sampleData <- fs[410:415, c("Quarter", "Lat", "Lon")]
+  
+  sampleData[, c("Struck", "Neighbor", "Depth", "Mag"):=0]
+  
+  dist16Quakes <- sampleData[, lapply(1:nrow(earthquake), 
+                                      function(x) GreatCircleDist(Lon, Lat, earthquake$Lat[x],earthquake$Lon[x]))]
+  sampleData[, dist:=apply(dist16Quakes, 1, FUN=min)]
+  sampleData[, minInd:=apply(dist16Quakes, 1, FUN=which.min)]
+  
+  sampleData[, distMMI5:=earthquake$MMI5[minInd]]
+  sampleData[, distMMI1:=earthquake$MMI1[minInd]]
+  
+  validInd <- which(sampleData[[period]] %in% earthquake[[period]])
+  if (length(validInd)>0){
+    
+    sampleData[validInd, Depth:=earthquake$Depth[minInd]]
+    sampleData[validInd, Mag:=earthquake$Mag[minInd]]
+    
+    sampleData[validInd & dist<=distMMI5, Struck := 1]
+    sampleData[validInd & dist>distMMI5 & dist<=distMMI1, Neighbor := 1]  
+  }
+  return(sampleData[, c("Struck", "Neighbor", "Depth", "Mag")])
+}  
+
+## Call the function -----
+# Refer lon and lat with pi
+earthquake[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
+fs[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
+
+# Run StrikeTreatment for fs
+fs[, c("Struck", "Neighbor", "Depth", "Mag"):= 
+     lapply(1:nrow(fs), function(x) StrikeTreatment(fs[x,c("Quarter", "Lat", "Lon")], earthquake,"Quarter"))]
 
 # Mark the struck and neighbor group by the great-circle distance 
 # betweeen semisic centers and firms
 
 for (quake in 1:nrow(earthquake)){
-  # Calculate the GC distance
-  R = 6371.004
-  LatA = earthquake$Lat[quake]/180*pi
-  LatB = company$Lat[match(fs$Stkcd,company$Stkcd)]/180*pi
-  LonA = earthquake$Lon[quake]/180*pi
-  LonB = company$Lon[match(fs$Stkcd,company$Stkcd)]/180*pi
-  
-  C=sin(LatA)*sin(LatB) + 
-    cos(LatA)*cos(LatB)*
-    cos(abs(LonA-LonB))
-  
-  dist = R*acos(C)
-  
+
   fs$Struck[which(fs$Season==earthquake$Season[quake] & fs$Struck==0)] <- 
     1*(dist<=earthquake$MMI5[quake])[which(fs$Season==earthquake$Season[quake] & fs$Struck==0)]
   
@@ -37,24 +96,3 @@ for (quake in 1:nrow(earthquake)){
 }
 
 fs$Year <- substr(fs$Accper,1,4)
-# Lag of quake event
-fs <- fs[, n_1 := shift(Neighbor*Mag, n=1L, type = "lead"), by = Stkcd]
-fs <- fs[, s_1 := shift(Struck*Mag, n=1L, type = "lead"), by = Stkcd]
-
-fs <- fs[, n1 := shift(Neighbor*Mag, n=1L, type = "lag"), by = Stkcd]
-fs <- fs[, s1 := shift(Struck*Mag, n=1L, type = "lag"), by = Stkcd]
-fs <- fs[, n2 := shift(Neighbor*Mag, n=2L, type = "lag"), by = Stkcd]
-fs <- fs[, s2 := shift(Struck*Mag, n=2L, type = "lag"), by = Stkcd]
-fs <- fs[, n3 := shift(Neighbor*Mag, n=3L, type = "lag"), by = Stkcd]
-fs <- fs[, s3 := shift(Struck*Mag, n=3L, type = "lag"), by = Stkcd]
-fs <- fs[, n4 := shift(Neighbor*Mag, n=4L, type = "lag"), by = Stkcd]
-fs <- fs[, s4 := shift(Struck*Mag, n=4L, type = "lag"), by = Stkcd]
-
-fs <- fs[, n5 := shift(Neighbor*Mag, n=5L, type = "lag"), by = Stkcd]
-fs <- fs[, s5 := shift(Struck*Mag, n=5L, type = "lag"), by = Stkcd]
-fs <- fs[, n6 := shift(Neighbor*Mag, n=6L, type = "lag"), by = Stkcd]
-fs <- fs[, s6 := shift(Struck*Mag, n=6L, type = "lag"), by = Stkcd]
-fs <- fs[, n7 := shift(Neighbor*Mag, n=7L, type = "lag"), by = Stkcd]
-fs <- fs[, s7 := shift(Struck*Mag, n=7L, type = "lag"), by = Stkcd]
-fs <- fs[, n8 := shift(Neighbor*Mag, n=8L, type = "lag"), by = Stkcd]
-fs <- fs[, s8 := shift(Struck*Mag, n=8L, type = "lag"), by = Stkcd]
