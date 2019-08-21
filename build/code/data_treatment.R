@@ -74,23 +74,3 @@ fs[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
 # Run StrikeTreatment for fs
 fs[, c("Struck", "Neighbor", "Depth", "Mag"):= 
      lapply(1:nrow(fs), function(x) StrikeTreatment(fs[x,c("Quarter", "Lat", "Lon")], earthquake,"Quarter"))]
-
-# Mark the struck and neighbor group by the great-circle distance 
-# betweeen semisic centers and firms
-
-for (quake in 1:nrow(earthquake)){
-
-  fs$Struck[which(fs$Season==earthquake$Season[quake] & fs$Struck==0)] <- 
-    1*(dist<=earthquake$MMI5[quake])[which(fs$Season==earthquake$Season[quake] & fs$Struck==0)]
-  
-  fs$Neighbor[which(fs$Season==earthquake$Season[quake] & fs$Neighbor==0 & fs$Struck==0)] <-
-    1*(dist>earthquake$MMI5[quake] & dist<=earthquake$MMI1[quake])[which(fs$Season==earthquake$Season[quake] & fs$Neighbor==0 & fs$Struck==0)]
-  
-  fs$Neighbor[fs$Season==earthquake$Season[quake] & fs$Struck==1] <- 0
-  
-  fs$Depth[fs$Season==earthquake$Season[quake]] <- earthquake$Depth[quake]
-  
-  fs$Mag[fs$Season==earthquake$Season[quake]] <- earthquake$Mag[quake]
-}
-
-fs$Year <- substr(fs$Accper,1,4)
