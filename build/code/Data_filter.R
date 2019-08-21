@@ -36,13 +36,15 @@ fs <- fread("Cash_RD.csv")
 names(fs) <- c("Stkcd","Accper","Reptyp","Cash","RD","TA","DebtL","TL","TE")
 
 # Keep only consolidated report
-fs <- fs[Reptyp=="A", c("Stkcd","Accper","Cash","RD","TA","DebtL","TL")]
+fs <- fs[Reptyp=="A", c("Stkcd","Accper","Cash","RD","TA","DebtL","TL","TE")]
 # Keep only shares listed before 2007
 fs <- fs[Stkcd %in% company$Stkcd,]
 # Drop year beginning record due to replication
 fs <- fs[!grepl("/1/1",Accper)]
 # Keep only main board stock market
 fs <- fs[Stkcd<002000|Stkcd>002999,]
+# Drop empty observation
+fs <- fs[TA>0,]
 
 # Substract season(quarter)
 fs$Quarter <- as.yearqtr(fs$Accper, format = "%Y/%m/%d")
