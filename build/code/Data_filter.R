@@ -16,6 +16,7 @@ names(earthquake) <- c("Date","Lat","Lon","Depth","Mag","MMI6","MMI5","MMI1","Fa
 
 # Substract season(quarter)
 earthquake$Quarter <- as.yearqtr(as.character(earthquake$Date), format = "%Y%m%d")
+earthquake$Year <- format(earthquake$Quarter, format = "%Y")
 
 ## 2.Company loaction data -----
 # Load the data but drop city name
@@ -48,6 +49,7 @@ fs <- fs[TA>0,]
 
 # Substract season(quarter)
 fs$Quarter <- as.yearqtr(fs$Accper, format = "%Y/%m/%d")
+fs$Year <- format(fs$Quarter, format = "%Y")
 fs$Season <- format(fs$Quarter, format = "%q")
 
 ## 6.Operating income -----
