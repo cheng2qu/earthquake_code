@@ -46,6 +46,8 @@ fs <- fs[!grepl("/1/1",Accper)]
 fs <- fs[Stkcd<002000|Stkcd>002999,]
 # Drop empty observation
 fs <- fs[TA>0,]
+# Drop non-positive equity observation
+fs <- fs[TE>0,] # Omit 504 observations
 
 # Substract season(quarter)
 fs$Quarter <- as.yearqtr(fs$Accper, format = "%Y/%m/%d")

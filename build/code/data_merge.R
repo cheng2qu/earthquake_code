@@ -11,7 +11,7 @@ source_data <- "data_pre_merge.RData"
 # Load filter data
 load(source_data)
 
-## Merge based on fs table -----
+## Merge tables -----
 # Merge fs with industry code
 fs <- merge(fs,ind,by = "Stkcd", all.x = TRUE)
 # Merge fs with company location
@@ -34,15 +34,8 @@ fs[, c("Cash","RD","TA","TL","TE","DebtL","OpIncome","InsuranceExp") :=
 ## Calculate ratios -----
 # Cash holding ratio
 fs[, Cash_p := Cash/TA]
-
 # Leverage ratio
-fs[, Leverage := TL/TE]
-# Asign value to infinte leverage ratio (when TA=TL)
-fs$Leverage[which(fs$Leverage>=1000)] <- 1000 
-fs$Leverage[which(fs$Leverage<=-1000)] <- -1000
-
-# Insurance overage ratio
-fs[, Ins_p := InsuranceExp/OpIncome]
+fs[, Leverage := log(TL/TE)]
 
 ## Mark the sample into thirds by measures
 # Level for equal-size groups
