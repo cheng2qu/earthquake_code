@@ -17,3 +17,6 @@ fs2 <- fs[grepl("12/31", fs$Accper),]
 
 # Redo treatment based on yearly earthquake strikes
 fs2[, c("Struck", "Neighbor", "Depth", "Mag")] <- StrikeTreatment(fs2[,c("Year", "Lat", "Lon")], earthquake,"Year")
+
+## Save the data tables
+save.image("data_split.RData")
