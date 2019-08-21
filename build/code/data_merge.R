@@ -36,6 +36,8 @@ fs[, c("Cash","RD","TA","TL","TE","DebtL","OpIncome","InsuranceExp") :=
 fs[, Cash_p := Cash/TA]
 # Leverage ratio
 fs[, Leverage := log(TL/TE)]
+# Insurance coverage ratio
+fs[, Insurance_p := log(InsuranceExp/OpIncome)]
 
 ## Mark the sample into thirds by measures
 # Level for equal-size groups
