@@ -23,7 +23,6 @@ company <- fread("company_location.csv", header = TRUE, drop = "Regplc")
 
 ## 3.CPI -----
 CPI <- fread("CPI.csv")
-CPI$Quarter <- as.yearqtr(CPI$Season, format = "%Y/%m/%d")
 
 ## 4.Industry code -----
 ind <- fread("Industry.csv", select = c("Stkcd","Indcd","Nindcd"))
