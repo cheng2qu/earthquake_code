@@ -1,4 +1,4 @@
-## Create control dummy for earthquake struck
+## Create treatment dummy for earthquake struck
 
 ## 4. Mark the treatment and controlled groups
 fs$Struck <- 0
