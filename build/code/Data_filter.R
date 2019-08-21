@@ -1,39 +1,85 @@
-## Prepare point data: 
-## Earthquake events, company locations, CPI, industry classification
-
-## Remember to clean temp and output everytime before running
+## Filter data before merge 
 
 ## Setup -----
-
 # Load packages for all scripts
 require(data.table)
 require(zoo)
 
 # Set working directory to current folder
-setwd("~/R project/Code replication/build/input")
+input_dir <- "~/R project/Code replication/build/input"
+setwd(input_dir)
 
-## Earthquake events data -----
-
+## 1.Earthquake data -----
 earthquake <- read.table("earthquake_event.txt", header = TRUE)
-
 earthquake <- data.table(earthquake)
-
 names(earthquake) <- c("Date","Lat","Lon","Depth","Mag","MMI6","MMI5","MMI1","Fatalities","EconLoss")
 
 # Substract season(quarter)
 earthquake$Quarter <- as.yearqtr(as.character(earthquake$Date), format = "%Y%m%d")
 
-## Company loaction data -----
+## 2.Company loaction data -----
 # Load the data but drop city name
 company <- fread("company_location.csv", header = TRUE, drop = "Regplc")
 
-## Quarterly CPI -----
+## 3.CPI -----
 CPI <- fread("CPI.csv")
 CPI$Quarter <- as.yearqtr(CPI$Season, format = "%Y/%m/%d")
 
-## Industry data -----
+## 4.Industry code -----
 ind <- fread("Industry.csv", select = c("Stkcd","Indcd","Nindcd"))
 
 # Drop replicated values
-ind <- ind[!duplicated(ind$Stkcd),]
+ind <- ind[!duplicated(Stkcd),]
 
+## 5.Balance sheet data -----
+fs <- fread("Cash_RD.csv")
+names(fs) <- c("Stkcd","Accper","Reptyp","Cash","RD","TA","DebtL","TL","TE")
+
+# Keep only consolidated report
+fs <- fs[Reptyp=="A", c("Stkcd","Accper","Cash","RD","TA","DebtL","TL")]
+# Keep only shares listed before 2007
+fs <- fs[Stkcd %in% company$Stkcd,]
+# Drop year beginning record due to replication
+fs <- fs[!grepl("/1/1",Accper)]
+# Keep only main board stock market
+fs <- fs[Stkcd<002000|Stkcd>002999,]
+
+# Substract season(quarter)
+fs$Quarter <- as.yearqtr(fs$Accper, format = "%Y%m%d")
+
+## 6.Operating income -----
+Income <- read.table("OpIncome.txt", header = TRUE, stringsAsFactors=FALSE)
+Income <- data.table(Income)
+
+# Keep only consolidated report and drop year beginning record
+Income <- Income[Typrep == "A" & ! grepl("/01/01",Accper),]
+
+## 7.Propertity insurance expenses -----
+Insurance <- read.table("insurance.txt", header = TRUE, stringsAsFactors=FALSE)
+Insurance <- data.table(Insurance)
+
+## 8.Dividend -----
+div <- fread("Div.csv")
+
+# Keep only consolidated report and drop year beginning record
+div <- div[Typrep=="A"& ! grepl("/01/01",Accper),]
+# Correct the payoff ratio as 1-retainRatio
+div$Payoff <- 1-div$Payoff
+
+## 9.Net income -----
+NI <- read.table("NI.txt", header = TRUE)
+NI <- data.table(NI)
+
+# Keep only consolidated report and year end record
+NI <- NI[Typrep=="A" & grepl("/12/31",Accper),]
+
+## Save data to temp
+# Create temp direction if not exists
+temp_dir <- "~/R project/Code replication/build/temp"
+if (!file.exists(temp_dir)) {
+  dir.create(temp_dir)
+}
+# Switch working directory to temp folder
+setwd(temp_dir)
+# Save the data tables
+save.image("data_pre_merge.RData")
