@@ -45,7 +45,8 @@ fs <- fs[!grepl("/1/1",Accper)]
 fs <- fs[Stkcd<002000|Stkcd>002999,]
 
 # Substract season(quarter)
-fs$Quarter <- as.yearqtr(fs$Accper, format = "%Y%m%d")
+fs$Quarter <- as.yearqtr(fs$Accper, format = "%Y/%m/%d")
+fs$Season <- format(fs$Quarter, format = "%q")
 
 ## 6.Operating income -----
 Income <- read.table("OpIncome.txt", header = TRUE, stringsAsFactors=FALSE)
