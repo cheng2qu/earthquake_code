@@ -74,6 +74,13 @@ div <- fread("Div.csv")
 div <- div[Typrep=="A"& ! grepl("/01/01",Accper),]
 # Correct the payoff ratio as 1-retainRatio
 div$Payoff <- 1-div$Payoff
+# Aggregate year end data
+# Generate Year serie
+div$Year <- substr(div$Accper,1,4)
+# Sum semi-annual data
+div[, DivT := sum(Div,na.rm = TRUE), by=.(Stkcd,Year)]
+div[Payoff>0, Payoff:= DivT/Div*Payoff, by=.(Stkcd,Year)]
+div <- div[grepl("/12/31",div$Accper),.(Stkcd,Accper, DivT, Payoff )]
 
 ## 9.Net income -----
 NI <- read.table("NI.txt", header = TRUE)
