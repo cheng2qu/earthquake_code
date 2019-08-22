@@ -6,53 +6,81 @@ temp_dir <- "~/R project/Code replication/build/temp"
 setwd(temp_dir)
 
 # Set link to temp data
-source_data <- "data_merged.RData"
+source_data <- "data_split.RData"
 # Load filter data
 load(source_data)
 
-## Lag fs data
-fs <- fs[which(!is.na(fs$Cash_p)),] # Delete records when total asset is zero
-fs <- fs[which(!is.na(fs$Leverage)),] # Delete records when total equity is negative
+## Lag-lead fs data -----
+# Order fs table
+fs <- fs[order(Stkcd, Quarter),]
 
-fs <- fs[, Cash_d := shift(Cash, n=1L, type = "lag"), by = Stkcd] # Lag the cash holding
-fs <- fs[, RD_d := shift(RD, n=1L, type = "lag"), by = Stkcd] # Lag the RD
-fs <- fs[, TA_d := shift(TA, n=1L, type = "lag"), by = Stkcd] # Lag the RD
+# Lag financial data
+cols <- c("Cash","RD","TA","Cash_p","Leverage","DebtL","OpIncome", "Insurance_p")
+addcols <- paste0(cols,"_d")
+fs[order(Stkcd, Quarter), (addcols) := shift(.SD, n=1L, type = "lag"), by = Stkcd, 
+   .SDcol = cols]
 
-fs <- fs[, Cash_p_d := shift(Cash_p, n=1L, type = "lag"), by = Stkcd] # Lag the cash holding ratio
-fs <- fs[, Leverage_d := shift(Leverage, n=1L, type = "lag"), by = Stkcd] # Lag the leverage ratio
-fs <- fs[, DebtL_d := shift(DebtL, n=1L, type = "lag"), by = Stkcd] # Lag the leverage ratio
-
-fs <- fs[, Cash_c := log(Cash_p)-log(Cash_p_d), by = Stkcd] # Lag the cash holding ratio
+# Diff cash holding ratio
+fs[, Cash_c := log(Cash_p/Cash_p_d)] 
 fs$Cash_c[which(is.nan(fs$Cash_c))] <- NA
 fs$Cash_c[which(is.infinite(fs$Cash_c))] <- NA
 
+# Lead cash holding ratio and insurance
+cols <- c("Cash_p","Insurance_p")
+addcols <- paste0(cols,"_1f")
+fs[order(Stkcd,Quarter), (addcols) := shift(.SD, n=1L, type = "lead"),
+   by = Stkcd, 
+   .SDcol = cols]
 
-lag Income
-lag insurance
+# Lag quake event
+cols <- c("MagN","MagS")
+addcols <- unlist(lapply(cols, function(x) paste0(x,"_lag",1:8)))
+fs[order(Stkcd,Quarter), (addcols) := shift(.SD, n=1:8, type = "lag"),
+   by = Stkcd, 
+   .SDcol = cols]
 
-# Lag of quake event
-fs <- fs[, n_1 := shift(Neighbor*Mag, n=1L, type = "lead"), by = Stkcd]
-fs <- fs[, s_1 := shift(Struck*Mag, n=1L, type = "lead"), by = Stkcd]
+# Lead quake event
+cols <- c("MagN","MagS")
+addcols <- paste0(cols,"_1f")
+fs[order(Stkcd,Quarter), (addcols) := shift(.SD, n=1, type = "lead"),
+   by = Stkcd, 
+   .SDcol = cols]
 
-fs <- fs[, n1 := shift(Neighbor*Mag, n=1L, type = "lag"), by = Stkcd]
-fs <- fs[, s1 := shift(Struck*Mag, n=1L, type = "lag"), by = Stkcd]
-fs <- fs[, n2 := shift(Neighbor*Mag, n=2L, type = "lag"), by = Stkcd]
-fs <- fs[, s2 := shift(Struck*Mag, n=2L, type = "lag"), by = Stkcd]
-fs <- fs[, n3 := shift(Neighbor*Mag, n=3L, type = "lag"), by = Stkcd]
-fs <- fs[, s3 := shift(Struck*Mag, n=3L, type = "lag"), by = Stkcd]
-fs <- fs[, n4 := shift(Neighbor*Mag, n=4L, type = "lag"), by = Stkcd]
-fs <- fs[, s4 := shift(Struck*Mag, n=4L, type = "lag"), by = Stkcd]
+## Lag-lead fs2 data -----
+# Order fs table
+fs2 <- fs2[order(Stkcd, Year),]
 
-fs <- fs[, n5 := shift(Neighbor*Mag, n=5L, type = "lag"), by = Stkcd]
-fs <- fs[, s5 := shift(Struck*Mag, n=5L, type = "lag"), by = Stkcd]
-fs <- fs[, n6 := shift(Neighbor*Mag, n=6L, type = "lag"), by = Stkcd]
-fs <- fs[, s6 := shift(Struck*Mag, n=6L, type = "lag"), by = Stkcd]
-fs <- fs[, n7 := shift(Neighbor*Mag, n=7L, type = "lag"), by = Stkcd]
-fs <- fs[, s7 := shift(Struck*Mag, n=7L, type = "lag"), by = Stkcd]
-fs <- fs[, n8 := shift(Neighbor*Mag, n=8L, type = "lag"), by = Stkcd]
-fs <- fs[, s8 := shift(Struck*Mag, n=8L, type = "lag"), by = Stkcd]
+# Lag financial data
+cols <- c("Cash","RD","TA","Cash_p","Leverage","DebtL","OpIncome", "Insurance_p", "Payoff")
+addcols <- paste0(cols,"_d")
+fs2[order(Stkcd, Year), (addcols) := shift(.SD, n=1L, type = "lag"), by = Stkcd, 
+   .SDcol = cols]
 
-## Lead fs data
-# One quarter forward on cash ratio
-fs <- fs[, Cash_p_1f := shift(Cash_p, n=1L, type = "lead"), by = Stkcd] # Lead the cash holding ratio
+# Lead cash holding ratio and insurance
+cols <- c("Cash_p","Insurance_p", "Payoff")
+addcols <- paste0(cols,"_1f")
+fs2[order(Stkcd, Year), (addcols) := shift(.SD, n=1L, type = "lead"),
+   by = Stkcd, 
+   .SDcol = cols]
 
+# Lag quake event
+cols <- c("MagN","MagS")
+addcols <- unlist(lapply(cols, function(x) paste0(x,"_lag",1:4)))
+fs2[order(Stkcd, Year), (addcols) := shift(.SD, n=1:4, type = "lag"),
+   by = Stkcd, 
+   .SDcol = cols]
+
+# Lead quake event
+cols <- c("MagN","MagS")
+addcols <- paste0(cols,"_1f")
+fs2[order(Stkcd, Year), (addcols) := shift(.SD, n=1, type = "lead"),
+   by = Stkcd, 
+   .SDcol = cols]
+
+## Lag-lead fs2 data -----
+
+
+## Save lead/lag variable
+rm(div)
+# Save data to temp
+save.image("data_lag.RData")
