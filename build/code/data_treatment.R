@@ -2,8 +2,7 @@
 
 ## Setup -----
 # Set the working directory to access temp data
-temp_dir <- "~/R project/Code replication/build/temp"
-setwd(temp_dir)
+setwd("~/R project/Code replication/build/temp")
 
 # Set link to temp data
 source_data <- "data_merged.RData"

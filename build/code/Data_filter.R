@@ -1,6 +1,9 @@
 ## Filter data before merge 
 
 ## Setup -----
+
+rm(list=ls())
+
 # Load packages for all scripts
 require(data.table)
 require(zoo)
@@ -8,8 +11,7 @@ require(zoo)
 source("~/R project/Code replication/build/code/changeDir_function.R")
 
 # Set working directory to current folder
-input_dir <- "~/R project/Code replication/build/input"
-setwd(input_dir)
+setwd("~/R project/Code replication/build/input")
 
 ## 1.Earthquake data -----
 earthquake <- read.table("earthquake_event.txt", header = TRUE)

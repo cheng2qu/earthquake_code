@@ -3,8 +3,7 @@
 
 ## Setup -----
 # Set the working directory to access temp data
-temp_dir <- "~/R project/Code replication/build/temp"
-setwd(temp_dir)
+setwd("~/R project/Code replication/build/temp")
 
 # Set link to temp data
 source_data <- "data_pre_merge.RData"
@@ -49,6 +48,6 @@ fs[, c("quanTA","quanOI","quanLev", "quanCash_p") :=
 
 ## Save merged data
 # Drop merged tables
-rm(company,ind, CPI,Income,Insurance)
+rm(company, CPI, Income, Insurance)
 # Save data to temp
 save.image("data_merged.RData")

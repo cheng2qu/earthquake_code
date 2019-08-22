@@ -3,8 +3,7 @@
 
 ## Setup -----
 # Set the working directory to access temp data
-temp_dir <- "~/R project/Code replication/build/temp"
-setwd(temp_dir)
+setwd("~/R project/Code replication/build/temp")
 
 # Set link to temp data
 source_data <- "data_treatment.RData"
@@ -22,5 +21,4 @@ fs2[, c("Struck", "Neighbor", "Depth", "Mag")] <- StrikeTreatment(fs2[,c("Year",
 fs2 <- merge(fs2, div, by = c("Stkcd","Accper"))
 
 ## Save the data tables
-rm(earthquake)
 save.image("data_split.RData")
