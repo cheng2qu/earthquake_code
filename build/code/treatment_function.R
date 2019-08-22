@@ -28,7 +28,10 @@ GreatCircleDist <- function(LatA, LonA, LatB, LonB, R){
 ## Function asigns treatment -----
 StrikeTreatment <- function(sampleData, quake, period){
   # Period can be either quarter or year
-  
+  if(missing(period)) {
+    warning("Quarterly data as default")
+    period <- "Quarter"
+  }
   # Set a number big enough as Inf
   R <- 6000
   
@@ -47,18 +50,21 @@ StrikeTreatment <- function(sampleData, quake, period){
                                  function(x) (get(period)!= quake[[period]][x])*R)]
   distList <- distList + distAdj
   
-  # Substract the closet distance
-  sampleData[, dist:=apply(distList, 1, FUN=min)]
-  sampleData[, minInd:=apply(distList, 1, FUN=which.min)]
-  
-  sampleData[, distMMI5:= quake$MMI5[minInd]]
-  sampleData[, distMMI1:= quake$MMI1[minInd]]
-  
   # Asign treatment group by dist comparing with MMI5 and MMI1 dists
-  sampleData[dist<=distMMI5, Struck := 1]
-  sampleData[dist>distMMI5 & dist<=distMMI1, Neighbor := 1] 
-  sampleData[dist<=distMMI1, Depth:= quake$Depth[minInd]]
-  sampleData[dist<=distMMI1, Mag:= quake$Mag[minInd]]
+  StruckList <- 1*distList[, mapply("<=", .SD, quake$MMI5)]
+  # If struck, neighbor=0 regardless of other quake events
+  NeighborList <- matrix((rowSums(StruckList)==0),20,16)*
+    distList[, mapply("<=", .SD, quake$MMI1)]*
+    distList[, mapply(">", .SD, quake$MMI5)]
   
+  MagList <- cbind(t(matrix(quake$Mag,16,20))*StruckList,t(matrix(quake$Mag,16,20))*NeighborList)
+
+  sampleData$Struck <- 1*(rowSums(StruckList)>0)
+  sampleData$Neighbor <- 1*(rowSums(NeighborList)>0)
+  sampleData$Mag <- apply(MagList, 1, FUN=max)
+  a <- matrix(quake$Depth, 32,1)
+  b <- apply(MagList, 1, FUN=which.max)
+  sampleData$Depth <- a[b]*(sampleData$Struck+sampleData$Neighbor)
+
   return(sampleData[, c("Struck", "Neighbor", "Depth", "Mag")])
 }  
