@@ -148,3 +148,14 @@ sample <- fs[401:420,c("Quarter", "Lat", "Lon")]
 validInd <- 5:10
 sample[intersect(validInd, which(Lat<0.05)), Lon:=-1]
 sample[validInd ,  Lon:=-1]
+
+## Shift obs rbind to itself
+DT <- data.table(year=rep(2010:2011, each=3), v1=1:6, v2=7:12)
+DT[order(year), shift(.SD, 1:2, give.names = TRUE), by=year]
+
+DT[, lapply(.SD, "*", year), .SDcol=2:3]
+DT[, c("MagS","MagN") := lapply(.SD, "*", year), .SDcol=2:3]
+
+DT[order(year), diff(v1, lag = 1), by=year]
+
+
