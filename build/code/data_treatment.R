@@ -75,6 +75,12 @@ fs[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
 fs[, c("Struck", "Neighbor", "Depth", "Mag")] <- StrikeTreatment(fs[,c("Quarter", "Lat", "Lon")], earthquake,"Quarter")
 
 fs[, c("MagS", "MagN") := lapply(.SD, "*", Mag), .SDcol=c("Struck", "Neighbor")]
+
+# Other earthquake -----
+fs$other <- 0
+eventSeason <- c("20110331","20150630","20160630","20161231")
+fs$other[fs$Season %in% eventSeason] <- 1
+
 ## Save treatment variable
 # Save data to temp
 save.image("data_treatment.RData")
