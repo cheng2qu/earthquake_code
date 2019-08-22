@@ -5,6 +5,8 @@
 # Set the working directory to access temp data
 setwd("~/R project/Code replication/build/temp")
 
+# Empty workspace
+rm(list = ls())
 # Set link to temp data
 source_data <- "data_treatment.RData"
 # Load filter data

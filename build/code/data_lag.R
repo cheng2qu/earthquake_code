@@ -4,6 +4,8 @@
 # Set the working directory to access temp data
 setwd("~/R project/Code replication/build/temp")
 
+# Empty workspace
+rm(list = ls())
 # Set link to temp data
 source_data <- "data_split.RData"
 # Load filter data
@@ -77,19 +79,21 @@ fs2[order(Stkcd, Year), (addcols) := shift(.SD, n=1, type = "lead"),
    .SDcol = cols]
 
 ## Save lead/lag variable
-# Remove div
-rm(div)
+# Select data to save
+lsList <- ls()
+dropList <- c("addcols", "cols", "path_dir", "source_data")
+saveList <- lsList[!lsList %in% dropList]
 # Save data to temp
-save.image("data_lag.RData")
+save(list=saveList, file="data_build.RData")
 
 # Save data to output
-output_dir <- "~/R project/Code replication/build/output"
-changeDir(output_dir)
+path_dir <- "~/R project/Code replication/build/output"
+changeDir(path_dir)
 # Save the data tables
-save.image("data_build.RData")
+save(list=saveList, file="data_build.RData")
 
 # Save data to analysis/input
-input_dir <- "~/R project/Code replication/analysis/input"
-changeDir(input_dir)
+path_dir <- "~/R project/Code replication/analysis/input"
+changeDir(path_dir)
 # Save the data tables
-save.image("data_build.RData")
+save(list=saveList, file="data_build.RData")

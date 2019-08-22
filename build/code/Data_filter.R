@@ -1,8 +1,8 @@
 ## Filter data before merge 
 
 ## Setup -----
-
-rm(list=ls())
+# Empty workspace
+rm(list = ls())
 
 # Load packages for all scripts
 require(data.table)
@@ -95,8 +95,8 @@ NI <- NI[Typrep=="A" & grepl("/12/31",Accper),]
 
 ## Save data to temp
 # Create temp direction if not exists
-temp_dir <- "~/R project/Code replication/build/temp"
+path_dir <- "~/R project/Code replication/build/temp"
 # Switch working directory to temp folder
-changeDir(temp_dir)
+changeDir(path_dir)
 # Save the data tables
 save.image("data_pre_merge.RData")

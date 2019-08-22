@@ -2,6 +2,8 @@
 ## Calculate variables from merged data
 
 ## Setup -----
+# Empty workspace
+rm(list = ls())
 # Set the working directory to access temp data
 setwd("~/R project/Code replication/build/temp")
 
@@ -47,7 +49,9 @@ fs[, c("quanTA","quanOI","quanLev", "quanCash_p") :=
    by = "Accper"]
 
 ## Save merged data
-# Drop merged tables
-rm(company, CPI, Income, Insurance)
+# Select data to save
+lsList <- ls()
+dropList <- c("company", "CPI", "Income", "Insurance", "n")
+saveList <- lsList[!lsList %in% dropList]
 # Save data to temp
-save.image("data_merged.RData")
+save(list=saveList, file="data_merged.RData")
