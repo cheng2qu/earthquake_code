@@ -4,7 +4,10 @@
 temp_dir <- c("~/R project/Code replication/build/temp/",
               "~/R project/Code replication/analysis/temp/")
 temp <- lapply(temp_dir, function(x) 
-  file.remove(file.path(x), list.files(x)))
+  if (file.exists(x)){
+    file.remove(file.path(x), list.files(x))
+    }
+  )
 
 ## Run scripts in build part
 fileDir <- "~/R project/Code replication/build/code/"
