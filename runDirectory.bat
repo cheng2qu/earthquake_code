@@ -1,0 +1,5 @@
+"C:\Users\cqu\Documents\R\R-3.5.3\bin\Rscript.exe" "C:\Users\cqu\Documents\R project\Code replication\build\code\data_filter.R"
+"C:\Users\cqu\Documents\R\R-3.5.3\bin\Rscript.exe" "C:\Users\cqu\Documents\R project\Code replication\build\code\data_merge.R"
+"C:\Users\cqu\Documents\R\R-3.5.3\bin\Rscript.exe" "C:\Users\cqu\Documents\R project\Code replication\build\code\data_treatment.R"
+"C:\Users\cqu\Documents\R\R-3.5.3\bin\Rscript.exe" "C:\Users\cqu\Documents\R project\Code replication\build\code\data_split.R"
+"C:\Users\cqu\Documents\R\R-3.5.3\bin\Rscript.exe" "C:\Users\cqu\Documents\R project\Code replication\build\code\data_lag.R"
