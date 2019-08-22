@@ -24,8 +24,8 @@ fs <- merge(fs,Insurance,by = c("Stkcd","Accper"), all.x = TRUE)
 fs <- merge(fs,CPI,by.x = "Accper", by.y ="Season", all.x = TRUE)
 
 ## Create cross index -----
-fs$Ind_Season <- paste(fs$Indcd,fs$Season %% 10000,sep = "_") # Industry-season index
-fs$City_Season <- paste(fs$City,fs$Season %% 10000,sep = "_") # City-season index
+fs$Ind_Season <- paste(fs$Indcd,fs$Season,sep = "_") # Industry-season index
+fs$City_Season <- paste(fs$City,fs$Season,sep = "_") # City-season index
 
 ## Adjust fs with CPI -----
 fs[, c("Cash","RD","TA","TL","TE","DebtL","OpIncome","InsuranceExp") :=
@@ -35,9 +35,9 @@ fs[, c("Cash","RD","TA","TL","TE","DebtL","OpIncome","InsuranceExp") :=
 # Cash holding ratio
 fs[, Cash_p := Cash/TA]
 # Leverage ratio
-fs[, Leverage := log(TL/TE)]
+fs[, Leverage := TL/TE]
 # Insurance coverage ratio
-fs[, Insurance_p := log(InsuranceExp/OpIncome)]
+fs[, Insurance_p := InsuranceExp/OpIncome]
 
 ## Mark the sample into thirds by measures
 # Level for equal-size groups
