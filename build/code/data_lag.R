@@ -21,7 +21,7 @@ fs[order(Stkcd, Quarter), (addcols) := shift(.SD, n=1L, type = "lag"), by = Stkc
    .SDcol = cols]
 
 # Diff cash holding ratio
-fs[, Cash_c := log(Cash_p/Cash_p_d)] 
+fs[, Cash_c := Cash_p/Cash_p_d] 
 fs$Cash_c[which(is.nan(fs$Cash_c))] <- NA
 fs$Cash_c[which(is.infinite(fs$Cash_c))] <- NA
 
@@ -77,10 +77,20 @@ fs2[order(Stkcd, Year), (addcols) := shift(.SD, n=1, type = "lead"),
    by = Stkcd, 
    .SDcol = cols]
 
-## Lag-lead fs2 data -----
-
-
 ## Save lead/lag variable
+# Remove div
 rm(div)
 # Save data to temp
 save.image("data_lag.RData")
+
+# Save data to output
+output_dir <- "~/R project/Code replication/build/output"
+changeDir(ouput_dir)
+# Save the data tables
+save.image("data_build.RData")
+
+# Save data to analysis/input
+input_dir <- "~/R project/Code replication/analysis/input"
+changeDir(input_dir)
+# Save the data tables
+save.image("data_build.RData")

@@ -4,6 +4,8 @@
 # Load packages for all scripts
 require(data.table)
 require(zoo)
+# Load function changeDir
+source("~/R project/Code replication/build/code/changeDir_function.R")
 
 # Set working directory to current folder
 input_dir <- "~/R project/Code replication/build/input"
@@ -92,10 +94,7 @@ NI <- NI[Typrep=="A" & grepl("/12/31",Accper),]
 ## Save data to temp
 # Create temp direction if not exists
 temp_dir <- "~/R project/Code replication/build/temp"
-if (!file.exists(temp_dir)) {
-  dir.create(temp_dir)
-}
 # Switch working directory to temp folder
-setwd(temp_dir)
+changeDir(temp_dir)
 # Save the data tables
 save.image("data_pre_merge.RData")
