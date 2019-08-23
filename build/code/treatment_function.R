@@ -9,7 +9,7 @@ GreatCircleDist <- function(LatA, LonA, LatB, LonB, R){
   
   # Set the radius as mean earth radius
   if (missing(R)) {
-    R = 6371
+    R <- 6371
   }
   
   # Check if lon and lat are measured in pi
@@ -18,15 +18,15 @@ GreatCircleDist <- function(LatA, LonA, LatB, LonB, R){
   }
   
   # Calculate central angle C
-  C=sin(LatA)*sin(LatB) + cos(LatA)*cos(LatB)*cos(abs(LonA-LonB))
+  C <- sin(LatA)*sin(LatB) + cos(LatA)*cos(LatB)*cos(abs(LonA-LonB))
   
   # Calculate GC dist
-  dist = R*acos(C)
+  dist <- R*acos(C)
   return(dist)
 }
 
 ## Function asigns treatment -----
-StrikeTreatment <- function(sampleData, quake, period){
+StrikeTreatment <- function(Data, earthquake, period){
   # Period can be either quarter or year
   if(missing(period)) {
     warning("Quarterly data as default")
@@ -34,7 +34,11 @@ StrikeTreatment <- function(sampleData, quake, period){
   }
   # Set a number big enough as Inf
   R <- 6000
+  nData <- nrow(Data)
+  nEvent <- nrow(earthquake)
   
+  quake <- copy(earthquake)
+  sampleData <- copy(Data)
   # Refer lon and lat with pi
   quake[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
   sampleData[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
@@ -51,18 +55,19 @@ StrikeTreatment <- function(sampleData, quake, period){
   distList <- distList + distAdj
   
   # Asign treatment group by dist comparing with MMI5 and MMI1 dists
-  StruckList <- 1*distList[, mapply("<=", .SD, quake$MMI5)]
+  StruckList <- 1*(distList<=t(matrix(quake$MMI5,nEvent,nData)))
   # If struck, neighbor=0 regardless of other quake events
-  NeighborList <- matrix((rowSums(StruckList)==0),20,16)*
-    distList[, mapply("<=", .SD, quake$MMI1)]*
-    distList[, mapply(">", .SD, quake$MMI5)]
+  NeighborList <- matrix(1*(rowSums(StruckList)==0),nData,nEvent)*
+    (distList<=t(matrix(quake$MMI1,nEvent,nData)))*
+    (distList>t(matrix(quake$MMI5,nEvent,nData)))
   
-  MagList <- cbind(t(matrix(quake$Mag,16,20))*StruckList,t(matrix(quake$Mag,16,20))*NeighborList)
+  MagList <- cbind(t(matrix(quake$Mag,nEvent,nData))*StruckList,
+                   t(matrix(quake$Mag,nEvent,nData))*NeighborList)
 
   sampleData$Struck <- 1*(rowSums(StruckList)>0)
   sampleData$Neighbor <- 1*(rowSums(NeighborList)>0)
   sampleData$Mag <- apply(MagList, 1, FUN=max)
-  a <- matrix(quake$Depth, 32,1)
+  a <- matrix(quake$Depth, 2*nEvent, 1)
   b <- apply(MagList, 1, FUN=which.max)
   sampleData$Depth <- a[b]*(sampleData$Struck+sampleData$Neighbor)
 
