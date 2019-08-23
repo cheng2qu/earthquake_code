@@ -27,6 +27,10 @@ GreatCircleDist <- function(LatA, LonA, LatB, LonB, R){
 
 ## Function asigns treatment -----
 StrikeTreatment <- function(Data, earthquake, period){
+  
+}
+## Function asigns treatment -----
+StrikeTreatment <- function(Data, earthquake, period){
   # Period can be either quarter or year
   if(missing(period)) {
     warning("Quarterly data as default")
@@ -36,31 +40,31 @@ StrikeTreatment <- function(Data, earthquake, period){
   R <- 6000
   nData <- nrow(Data)
   nEvent <- nrow(earthquake)
-  
+
   quake <- copy(earthquake)
   sampleData <- copy(Data)
   # Refer lon and lat with pi
-  quake[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
-  sampleData[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
-  
+  quake[, c("Lat", "Lon") := lapply(.SD, "/", 180/pi), .SDcol = c("Lat", "Lon")]
+  sampleData[, c("Lat", "Lon") := lapply(.SD, "/", 180/pi), .SDcol = c("Lat", "Lon")]
+
   # Initiate the treatment
   sampleData[, c("Struck", "Neighbor", "Depth", "Mag"):=0]
   # Calculate the dist to seimic center regardless of time
-  distList <- sampleData[, lapply(1:nrow(quake), 
+  distList <- sampleData[, lapply(1:nrow(quake),
                                   function(x) GreatCircleDist(Lat, Lon, quake$Lat[x], quake$Lon[x]))]
   # If accounting period has no earthquake, add R~6000 to dist
   # so this data point would be given any treatment based on dist
-  distAdj <- sampleData[, lapply(1:nrow(quake), 
+  distAdj <- sampleData[, lapply(1:nEvent,
                                  function(x) (get(period)!= quake[[period]][x])*R)]
   distList <- distList + distAdj
-  
+
   # Asign treatment group by dist comparing with MMI5 and MMI1 dists
   StruckList <- 1*(distList<=t(matrix(quake$MMI5,nEvent,nData)))
   # If struck, neighbor=0 regardless of other quake events
   NeighborList <- matrix(1*(rowSums(StruckList)==0),nData,nEvent)*
     (distList<=t(matrix(quake$MMI1,nEvent,nData)))*
     (distList>t(matrix(quake$MMI5,nEvent,nData)))
-  
+
   MagList <- cbind(t(matrix(quake$Mag,nEvent,nData))*StruckList,
                    t(matrix(quake$Mag,nEvent,nData))*NeighborList)
 
@@ -72,4 +76,5 @@ StrikeTreatment <- function(Data, earthquake, period){
   sampleData$Depth <- a[b]*(sampleData$Struck+sampleData$Neighbor)
 
   return(sampleData[, c("Struck", "Neighbor", "Depth", "Mag")])
-}  
+}
+
