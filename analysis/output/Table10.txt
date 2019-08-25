@@ -1,0 +1,11 @@
+
+=========================================================
+Industry section Full sample Unaffected Stricken Neighbor
+Financials           12          10        1        1    
+Public utilities     143        112        1        30   
+Real estates         73          61        5        7    
+Conglomerate         109         79        8        22   
+Industry             866        526        43      297   
+Commerce             100         73        6        21   
+Total               1303        861        64      378   
+---------------------------------------------------------
