@@ -22,7 +22,7 @@ fs[order(Stkcd, Quarter), (addcols) := shift(.SD, n=1L, type = "lag"), by = Stkc
    .SDcol = cols]
 
 # Diff cash holding ratio
-fs[, Cash_c := Cash_p/Cash_p_d] 
+fs[, Cash_c := log(Cash_p)-log(Cash_p_d), by = Stkcd] 
 fs$Cash_c[which(is.nan(fs$Cash_c))] <- NA
 fs$Cash_c[which(is.infinite(fs$Cash_c))] <- NA
 

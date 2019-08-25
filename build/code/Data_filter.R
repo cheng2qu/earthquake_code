@@ -26,6 +26,7 @@ earthquake$Year <- format(earthquake$Quarter, format = "%Y")
 # Load the data but drop city name
 company <- fread("company_location.csv", header = TRUE)
 names(company) <- c("Stkcd","City","Lon","Lat")
+company <- unique(company)
 
 ## 3.CPI -----
 CPI <- fread("CPI.csv")
@@ -45,13 +46,15 @@ fs <- fs[Reptyp=="A", c("Stkcd","Accper","Cash","RD","TA","DebtL","TL","TE")]
 # Keep only shares listed before 2007
 fs <- fs[Stkcd %in% company$Stkcd,]
 # Drop year beginning record due to replication
-fs <- fs[!grepl("/1/1",Accper)]
+fs <- fs[!grepl("/1/1",Accper),]
 # Keep only main board stock market
 fs <- fs[Stkcd<002000|Stkcd>002999,]
-# Drop empty observation
-fs <- fs[TA>0,]
-# Drop non-positive equity observation
-fs <- fs[TE>0,] # Omit 504 observations
+# Mark records where total asset is zero
+fs$TA[fs$TA==0] <- NA
+# # Drop empty observation
+# fs <- fs[TA>0,]
+# # Drop non-positive equity observation
+# fs <- fs[TE>0,] # Omit 504 observations
 
 # Substract season(quarter)
 fs$Quarter <- as.yearqtr(fs$Accper, format = "%Y/%m/%d")

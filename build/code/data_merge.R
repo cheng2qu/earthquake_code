@@ -14,9 +14,9 @@ load(source_data)
 
 ## Merge tables -----
 # Merge fs with industry code
-fs <- merge(fs,ind,by = "Stkcd", all.x = TRUE)
+fs <- merge(fs,ind,by = "Stkcd", all = FALSE)
 # Merge fs with company location
-fs <- merge(fs,company,by = "Stkcd", all.x = TRUE)
+fs <- merge(fs,company,by = "Stkcd", all = FALSE)
 # Merge fs with Income
 fs <- merge(fs,Income,by = c("Stkcd","Accper"), all.x = TRUE)
 # Merge fs with Insurance
@@ -36,9 +36,21 @@ fs[, c("Cash","RD","TA","TL","TE","DebtL","OpIncome","InsuranceExp") :=
 # Cash holding ratio
 fs[, Cash_p := Cash/TA]
 # Leverage ratio
-fs[, Leverage := TL/TE]
+fs[, Leverage := log(TL/(TA-TL))]
+# Give value to infinte leverage ratio, i.e. TA=TL
+fs$Leverage[which(is.infinite(fs$Leverage)&fs$Leverage>0)] <- 9999 
+fs$Leverage[which(is.infinite(fs$Leverage)&fs$Leverage<0)] <- -9999
+# Delete records when total asset is zero
+fs <- fs[which(!is.na(fs$Cash_p)),] 
+# Delete records when total equity is negative
+fs <- fs[which(!is.na(fs$Leverage)),] 
+
 # Insurance coverage ratio
-fs[, Insurance_p := InsuranceExp/OpIncome]
+fs[, Insurance_p := InsuranceExp/(0.01+OpIncome)]
+# # Leverage ratio
+# fs[, Leverage := TL/TE]
+# # Insurance coverage ratio
+# fs[, Insurance_p := InsuranceExp/OpIncome]
 
 ## Mark the sample into thirds by measures
 # Level for equal-size groups
