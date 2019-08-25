@@ -113,37 +113,45 @@ treatment <- sapply(1:nrow(fs), function(x) StrikeTreatment(fs[x,], earthquake,"
 
 # Matric calculation version
 ## Function to asign treatment -----
-StrikeTreatment <- function(sampleData, earthquake, period){
-  # Calculate the dist to strikes
-  # Asign treatment group by dist comparing with MMI5 and MMI1 dists
-  
+StrikeTreatment <- function(sampleData, quake, period){
   # Period can be either quarter or year
+  
+  # Set a number big enough as Inf
+  R <- 6000
+  
+  # Refer lon and lat with pi
+  quake[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
+  sampleData[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
   
   # Initiate the treatment
   sampleData[, c("Struck", "Neighbor", "Depth", "Mag"):=0]
+  # Calculate the dist to seimic center regardless of time
+  distList <- sampleData[, lapply(1:nrow(quake), 
+                                  function(x) GreatCircleDist(Lat, Lon, quake$Lat[x], quake$Lon[x]))]
+  # If accounting period has no earthquake, add R~6000 to dist
+  # so this data point would be given any treatment based on dist
+  distAdj <- sampleData[, lapply(1:nrow(quake), 
+                                 function(x) (get(period)!= quake[[period]][x])*R)]
+  distList <- distList + distAdj
   
-  distList <- sampleData[, lapply(1:nrow(earthquake), 
-                                  function(x) GreatCircleDist(Lon, Lat, earthquake$Lat[x],earthquake$Lon[x]))]
+  # Substract the closet distance
   sampleData[, dist:=apply(distList, 1, FUN=min)]
   sampleData[, minInd:=apply(distList, 1, FUN=which.min)]
   
-  sampleData[, distMMI5:=earthquake$MMI5[minInd]]
-  sampleData[, distMMI1:=earthquake$MMI1[minInd]]
+  sampleData[, distMMI5:= quake$MMI5[minInd]]
+  sampleData[, distMMI1:= quake$MMI1[minInd]]
   
-  validInd <- which(sampleData[[period]] %in% earthquake[[period]])
-  if (length(validInd)>0){
-    
-    sampleData[validInd, Depth:=earthquake$Depth[minInd]]
-    sampleData[validInd, Mag:=earthquake$Mag[minInd]]
-    
-    sampleData[validInd & dist<=distMMI5, Struck := 1]
-    sampleData[validInd & dist>distMMI5 & dist<=distMMI1, Neighbor := 1]  
-  }
+  # Asign treatment group by dist comparing with MMI5 and MMI1 dists
+  sampleData[dist<=distMMI5, Struck := 1]
+  sampleData[dist>distMMI5 & dist<=distMMI1, Neighbor := 1] 
+  sampleData[dist<=distMMI1, Depth:= quake$Depth[minInd]]
+  sampleData[dist<=distMMI1, Mag:= quake$Mag[minInd]]
+  
   return(sampleData[, c("Struck", "Neighbor", "Depth", "Mag")])
 }  
 
 # Unit test
-StrikeTreatment(fs[401:420,c("Quarter", "Lat", "Lon")], earthquake,"Quarter")
+StrikeTreatment(fs[401:420,c("Quarter", "Lat", "Lon")], copy(earthquake),"Quarter")
 sample <- fs[401:420,c("Quarter", "Lat", "Lon")]
 validInd <- 5:10
 sample[intersect(validInd, which(Lat<0.05)), Lon:=-1]
@@ -158,4 +166,110 @@ DT[, c("MagS","MagN") := lapply(.SD, "*", year), .SDcol=2:3]
 
 DT[order(year), diff(v1, lag = 1), by=year]
 
+# Local variable in function
+f <- function(X,DT){
+  DT[order(year), shift(.SD, 1:2, give.names = TRUE), by=year]
+  return(X)
+}
+f(2,DT)
+print(DT)
+# At the end use copy()
 
+# Keep/remove objects by type
+inList <- ls()
+objectList <- sapply(inList,get)
+typeList <-sapply(objectList,typeof)
+ls(typeof())
+
+# Aggregate by earthquake event
+StrikeTreatment(fs[401:420,c("Quarter", "Lat", "Lon")], copy(earthquake),"Quarter")
+x <- fs[401:420,c("Quarter", "Lat", "Lon")]
+x <- cbind(x,StrikeTreatment(x, earthquake, "Quarter"))
+
+sapply(1:nrow(earthquake), function(x) {
+  colSums(StrikeTreatment(fs[,c("Quarter", "Lat", "Lon")], copy(earthquake[x,]),"Quarter"))
+})
+
+quake1 <- StrikeTreatment(fs[,c("Quarter", "Lat", "Lon")], copy(earthquake[1,]),"Quarter")
+
+quake1[Struck==1,]
+quake1[Neighbor==1,]
+
+earthquake[,list(N=sum(fs$Neighbor[fs$Quarter==Quarter]), S=sum(fs$Struck[fs$Quarter==Quarter])), by=Quarter] 
+# Aggregate numbers of neighbor and stricken firms
+
+earthquake_effect <- unique(fs$Quarter[fs$Neighbor==1 | fs$Struck==1]) # Aggregate earthquakes which affect listed firms
+unique(earthquake[earthquake$Quarter %in% earthquake_effect,"Date"])
+
+
+####################
+
+quake <- copy(earthquake)
+quake[, c("Lat", "Lon") := lapply(.SD, "/", 180*pi), .SDcol = c("Lat", "Lon")]
+earthquake
+
+Data <- fs[11401:11410,c("Quarter", "Lat", "Lon")]
+Data$Quarter[1:3] <- c("2008 Q3","2014 Q3", "2018 Q3")
+Data$Lon[1:3] <- c(34,30, 23)
+Data$Lat[1:3] <- c(108,105, 100)
+
+#####################
+fs <- fs[,.(Quarter, Lat, Lon)]
+Data <- copy(fs)
+quake <- 1
+
+####################
+load("D:/Master thesis/RData_matched0.04.RData")
+
+setwd("D:/Master thesis/Data_and_Rcode_40944")
+rm(list = ls())
+
+####################
+stargazer(fs[, !c("Stkcd", "Struck", "Neighbor")],
+          fs2[, !c("Stkcd", "Struck", "Neighbor")],
+          header=FALSE,
+          summary.stat = statList,
+          flip = TRUE, 
+          column.labels   = c("Quarterly data", "Annual data"),
+          column.separate = c(5, 2),
+          type='text')
+
+stargazer(attitude[1:4,], 
+          summary=FALSE, 
+          rownames=FALSE,
+          column.labels   = c("Quarterly data", "Annual data"),
+          column.separate = c(5, 3))
+####################
+path_dir <- "~/R project/Code replication/analysis/output"
+changeDir(path_dir)
+
+capture.output(
+  stargazer(fs[,!c("Stkcd", "Struck", "Neighbor")],
+            fs2[, !c("Stkcd", "Struck", "Neighbor")],
+            header=FALSE,
+            summary.stat = statList,
+            flip = TRUE, 
+            type='text'),
+  stargazer(fs[which(fs$Stkcd %in% fs$Stkcd[fs$Neighbor==1]),
+               !c("Stkcd", "Struck", "Neighbor")],
+            fs2[which(fs2$Stkcd %in% fs2$Stkcd[fs2$Neighbor==1]),
+                !c("Stkcd", "Struck", "Neighbor")],
+            header=FALSE,
+            summary.stat = statList,
+            flip = TRUE, 
+            type='text'),
+  file = "Table8.txt")
+
+stargazer(fs[which(!fs$Stkcd %in% fs$Stkcd[fs$Struck==1] & !fs$Stkcd %in% fs$Stkcd[fs$Neighbor==1]), 
+             !c("Stkcd", "Struck", "Neighbor")],
+          fs2[which(!fs2$Stkcd %in% fs2$Stkcd[fs2$Struck==1] & !fs2$Stkcd %in% fs2$Stkcd[fs2$Neighbor==1]),
+              !c("Stkcd", "Struck", "Neighbor")],
+          header=FALSE,
+          summary.stat = statList,
+          flip = TRUE, 
+          type='text',
+          digits = 2,
+          out = "temp.txt",
+          title = "Panel c: Unaffected Firms")
+
+######################

@@ -56,7 +56,7 @@ fs[, Insurance_p := InsuranceExp/(0.01+OpIncome)]
 # Level for equal-size groups
 n <- 3
 fs[, c("quanTA","quanOI","quanLev", "quanCash_p") := 
-     lapply(.SD, cut, breaks = n),
+     lapply(.SD, cut, breaks = n, labels = FALSE),
    .SDcol=c("TA","OpIncome","Leverage","Cash_p"),
    by = "Accper"]
 
