@@ -1,0 +1,12 @@
+\documentclass{article}
+
+\usepackage{Sweave}
+\begin{document}
+\input{output-concordance}
+
+```{results='asis'}
+stargazer(summary(fs[,!c("Stkcd", "Struck", "Neighbor")])
+,  header=FALSE, type='latex')
+
+
+\end{document}

@@ -54,9 +54,12 @@ fs[, Insurance_p := InsuranceExp/(0.01+OpIncome)]
 
 ## Mark the sample into thirds by measures
 # Level for equal-size groups
-n <- 3
+probs <- c(0, 1/3, 2/3, 1)
 fs[, c("quanTA","quanOI","quanLev", "quanCash_p") := 
-     lapply(.SD, cut, breaks = n, labels = FALSE),
+     lapply(.SD, function (x) 
+       findInterval(x, 
+                    quantile(x, probs,na.rm=TRUE), 
+                    rightmost.closed = TRUE)),
    .SDcol=c("TA","OpIncome","Leverage","Cash_p"),
    by = "Accper"]
 

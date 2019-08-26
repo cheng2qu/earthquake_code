@@ -1,0 +1,52 @@
+---
+title: "output"
+output: html_document
+---
+
+```{r setup}
+require(data.table)
+require(DescTools)
+# Load R-to-LaTeX package
+require(stargazer)
+
+# Set the working directory to access input data
+setwd("~/R project/Code replication/analysis/input")
+
+# Empty workspace
+rm(list = ls())
+# Load prepared data
+source_data <- "data_build.RData"
+load(source_data)
+
+## Fundamental data summary -----
+# Substract data
+fs[abs(Leverage)==9999, Leverage := NA]
+fs <- fs[,.(Stkcd, Struck, Neighbor, 
+            Cash_p*100,Leverage*100, TA/1000000, Cash/1000000,DebtL/1000000)]
+fs2 <- fs2[,.(Stkcd, Struck, Neighbor, 
+              InsuranceExp/1000,Payoff*100)]
+```
+
+```{r, results='asis'}
+stargazer(attitude
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

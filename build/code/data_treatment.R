@@ -19,8 +19,9 @@ fs[, c("MagS", "MagN") := lapply(.SD, "*", Mag), .SDcol=c("Struck", "Neighbor")]
 
 # Other earthquake -----
 fs$other <- 0
-eventSeason <- c("20110331","20150630","20160630","20161231")
-fs$other[fs$Season %in% eventSeason] <- 1
+eventSeason <- c("2011 Q1","2015 Q2","2016 Q2","2016 Q4")
+eventSeason <- as.yearqtr(eventSeason)
+fs$other[fs$Quarter %in% eventSeason] <- 1
 
 ## Save treatment variable
 # Select data to save
