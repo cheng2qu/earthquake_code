@@ -35,8 +35,9 @@ fs[order(Stkcd,Quarter), (addcols) := shift(.SD, n=1L, type = "lead"),
 
 # Lag quake event
 cols <- c("MagN","MagS")
-addcols <- unlist(lapply(cols, function(x) paste0(x,"_lag",1:8)))
-fs[order(Stkcd,Quarter), (addcols) := shift(.SD, n=1:8, type = "lag"),
+nLag <- c(1,2,3,4,8,12)
+addcols <- unlist(lapply(cols, function(x) paste0(x,"_lag",nLag)))
+fs[order(Stkcd,Quarter), (addcols) := shift(.SD, n=nLag, type = "lag"),
    by = Stkcd, 
    .SDcol = cols]
 
@@ -66,8 +67,9 @@ fs2[order(Stkcd, Year), (addcols) := shift(.SD, n=1L, type = "lead"),
 
 # Lag quake event
 cols <- c("MagN","MagS")
-addcols <- unlist(lapply(cols, function(x) paste0(x,"_lag",1:4)))
-fs2[order(Stkcd, Year), (addcols) := shift(.SD, n=1:4, type = "lag"),
+nLag <- c(1,2,3,4,8,12)
+addcols <- unlist(lapply(cols, function(x) paste0(x,"_lag", nLag)))
+fs2[order(Stkcd, Year), (addcols) := shift(.SD, n=nLag, type = "lag"),
    by = Stkcd, 
    .SDcol = cols]
 

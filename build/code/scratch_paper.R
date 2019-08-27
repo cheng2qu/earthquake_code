@@ -273,3 +273,94 @@ stargazer(fs[which(!fs$Stkcd %in% fs$Stkcd[fs$Struck==1] & !fs$Stkcd %in% fs$Stk
           title = "Panel c: Unaffected Firms")
 
 ######################
+x <- fs[, quanTA:= cut(TA, breaks = 3), by=Accper]
+
+######################
+fix1 <- plm(I(Cash_p_1f*100) ~ I(Neighbor*Mag) + I(Struck*Mag)  
+            +factor(Indcd)+ factor(City) -1, 
+            data = fs, index=c("Accper","Stkcd"), model="within")
+
+stargazer(fix1,da1,da2,da4,da8,da12,
+          dep.var.labels=c("Cash_t"),
+          # keep = c(1,2,3,6,7,8,9,10),
+          type='text')
+
+stargazer(da2, keep = 1:6, type = "text")
+x <- c(0,0,1,1,1,NA,1,0)
+rollsumr(x, k =4, na.rm=TRUE)
+
+fs[,rollsum(close1, k = 2, fill = 0,na.rm=TRUE), by= Stkcd]
+
+############################
+fix1 <- plm(I(Cash_p_1f*100) ~ I(Neighbor*Mag) + I(Struck*Mag)  
+            + factor(City) +factor(Season)+ factor(Indcd)-1, 
+            data = fs, index=c("Accper","Stkcd"), model="within")
+
+fixed <- plm(I(Cash_p_1f*100) ~ I(Neighbor*Mag) + I(Struck*Mag)+I(OpIncome/TA) + Leverage + log(TA)
+             +factor(City) +factor(Season) + factor(Indcd) -1,
+             data = fs, index=c("Accper","Stkcd"), model="within")
+
+stargazer(fixed, keep = 1:5, type = "text")
+###########################
+baseline <- plm(I(Cash_p_1f*100) ~ I(Neighbor*Mag) + I(Struck*Mag)+I(OpIncome/TA) + Leverage + log(TA)
+                + factor(Year)+ factor(Season)+factor(City) + factor(Indcd) -1,
+                data = fs, index=c("Stkcd"), model="within")
+
+## Regression (2) include overseas events
+oversea <- plm(I(Cash_p_1f*100) ~ I(Neighbor*Mag) + I(Struck*Mag)+other+I(OpIncome/TA) + Leverage + log(TA)
+               + factor(Year)+ factor(Season)+factor(City) + factor(Indcd) -1,
+               data = fs, index=c("Stkcd"), model="within")
+
+m11 <- plm(I(Cash_p_1f*100) ~ I(Neighbor*Mag) + I(Struck*Mag)+I(OpIncome/TA) + Leverage + log(TA)
+           +factor(City) +factor(Season)+factor(Indcd)-1, 
+           data = fs[fs$quanTA==1 & fs$quanLev==1], index=c("Accper","Stkcd"), model="within")
+
+m12 <- plm(I(Cash_p_1f*100) ~ I(Neighbor*Mag) + I(Struck*Mag)+I(OpIncome/TA) + Leverage + log(TA)
+           +factor(City) +factor(Season)+factor(Indcd)-1, 
+           data = fs[fs$quanTA==1 & fs$quanLev==2], index=c("Accper","Stkcd"), model="within")
+
+m13 <- plm(I(Cash_p_1f*100) ~ I(Neighbor*Mag) + I(Struck*Mag)+I(OpIncome/TA) + Leverage + log(TA)
+           +factor(City) +factor(Season)+factor(Indcd)-1, 
+           data = fs[fs$quanTA==1 & fs$quanLev==3], index=c("Accper","Stkcd"), model="within")
+stargazer(m11,m12,m13, keep = 1:5, type = "text")
+stargazer(m21,m22,m23, keep = 1:5, type = "text")
+
+##########################
+
+fix1 <- plm(I(Cash_p_1f*100) ~ I(Neighbor*Mag) + I(Struck*Mag)+I(OpIncome/TA) + Leverage + log(TA)
+            +factor(City)+factor(Indcd)-1, 
+            data = fs[fs$Indcd %in% c(4,5,6)], index=c("Accper","Stkcd"), model="within")
+stargazer(fix1, keep = 1:5, type = "text")
+
+############################
+fs[,close_1 := shift(Neighbor,n=1,fill = NA,type = "lag"), by=Stkcd] # Events in last quarter
+fs[,close_2 := rollsum(close1, k = 2, fill = NaN), by= Stkcd] # Events in recent 4 quarters
+fs[,close_4 := rollsum(close1, k = 4, fill = NaN), by= Stkcd] # Events in recent 4 quarters
+fs[,close_8 := rollsum(close1, k = 8, fill = NaN), by= Stkcd] # Events in recent 8 quarters
+fs[,close_12 := rollsum(close1, k = 12, fill = NaN), by= Stkcd] # Events in recent 12 quarters
+stargazer(da1, keep = 1:5, type = "text")
+
+fix1 <- plm(I(Cash_p_1f*100) ~ I(Neighbor*Mag) + I(Struck*Mag)+I(OpIncome/TA) + Leverage + log(TA)
+            +factor(City)+ factor(Indcd)-1, 
+            data = fs[fs$Indcd %in% c(4,5,6)], index=c("Accper","Stkcd"), model="within")
+
+stargazer(fix1,ex,ex2,ex3, keep = 1:7, type = "text")
+#################
+cashfs1<- plm(I(Cash_p_1f*100)  ~  I(Neighbor*Mag) + I(Struck*Mag) +
+                I(OpIncome/TA) +Leverage + log(TA) + 
+                factor(City) +   factor(Indcd)- 1,
+              data = fs2, index = c("Accper","Stkcd"), model = "within")
+stargazer(cashfs2, cashins2, keep = 1:7, type = "text")
+stargazer(Ins0, keep = 1:7, type = "text")
+
+############################
+stargazer(fix1,ex, keep = 1:7, type = "text")
+################
+setwd("D:/Master thesis/Data_and_Rcode_40944")
+save.image("~/R project/Code replication/analysis/temp/model5_Previous.RData")
+load("~/R project/Code replication/analysis/temp/model5_Previous.RData")
+
+summary(fs2$Ins_p)
+
+setwd("~/R project/Code replication/analysis/input")
+summary(fs2$Insurance_p)

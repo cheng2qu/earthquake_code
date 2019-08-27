@@ -20,7 +20,7 @@ fs2 <- fs[grepl("12/31", fs$Accper),]
 fs2[, c("Struck", "Neighbor", "Depth", "Mag")] <- StrikeTreatment(fs2[,c("Year", "Lat", "Lon")], earthquake,"Year")
 
 # Merge fs2 with div data
-fs2 <- merge(fs2, div, by = c("Stkcd","Accper"))
+fs2 <- merge(fs2, div, by = c("Stkcd","Year","Accper"))
 
 ## Save the data tables
 save.image("data_split.RData")
