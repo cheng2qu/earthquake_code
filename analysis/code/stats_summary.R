@@ -69,7 +69,7 @@ industry_tab <- rbind(industry_tab, colSums(industry_tab))
 industry_tab <- rbind(c("Full sample","Unaffected","Stricken","Neighbor"),
                       industry_tab)
 industry_tab <- cbind(c("Industry section","Financials","Public utilities","Real estates",
-                            "Conglomerate","Industry","Commerce","Total"),
+                        "Conglomerate","Industry","Commerce","Total"),
                       industry_tab)
 
 # Return table as text
@@ -87,6 +87,8 @@ capture.output(stargazer(industry_tab,
                file = "Table10.tex")
 
 ## Fundamental data summary -----
+# Select descriptive statitcs
+statList <- c("min", "p25","median","mean","p75","max","sd","n")
 # Substract data
 fs[abs(Leverage)==9999, Leverage := NA]
 fs <- fs[,.(Stkcd, Struck, Neighbor, 
@@ -101,6 +103,7 @@ colnames(fs2) <- c("Stkcd", "Struck", "Neighbor",
                    "Insurance expenses","Payout ratio(%)")
 
 # Save Table 8: Full sample descriptive stats
+
 capture.output(stargazer(fs[,!c("Stkcd", "Struck", "Neighbor")],
                          fs2[, !c("Stkcd", "Struck", "Neighbor")],
                          header=FALSE,
