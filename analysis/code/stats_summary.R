@@ -6,18 +6,11 @@
 require(stargazer)
 require(zoo)
 
-# Set the working directory to access input data
-setwd("~/R project/Code replication/analysis/input")
-
 # Empty workspace
 rm(list = ls())
 # Load prepared data
-source_data <- "data_build.RData"
+source_data <- "analysis/input/data_build.RData"
 load(source_data)
-
-# Set the working directory to output folder
-path_dir <- "~/R project/Code replication/analysis/output"
-changeDir(path_dir)
 
 ## Earthquake events aggregation -----
 # Sum up struck and neighbor firms by earthquake events
@@ -43,7 +36,7 @@ capture.output(stargazer(earthquake_tab,
                          type = "text",
                          digits = 2,
                          rownames=FALSE),
-               file = "Table9.txt")
+               file = "analysis/output/Table9.txt")
 
 # Redo for latex script
 capture.output(stargazer(earthquake_tab,
@@ -51,7 +44,7 @@ capture.output(stargazer(earthquake_tab,
                          type = "latex",
                          digits = 2,
                          rownames=FALSE),
-               file = "Table9.tex")
+               file = "analysis/output/Table9.tex")
 
 ## Industry distribution -----
 # Sum up by industry code
@@ -77,14 +70,14 @@ capture.output(stargazer(industry_tab,
                          summary = FALSE,
                          type = "text",
                          rownames=FALSE),
-               file = "Table10.txt")
+               file = "analysis/output/Table10.txt")
 
 # Redo for latex script
 capture.output(stargazer(industry_tab,
                          summary = FALSE,
                          type = "latex",
                          rownames=FALSE),
-               file = "Table10.tex")
+               file = "analysis/output/Table10.tex")
 
 ## Fundamental data summary -----
 # Select descriptive statitcs
@@ -132,7 +125,7 @@ capture.output(stargazer(fs[,!c("Stkcd", "Struck", "Neighbor")],
                          type='text',
                          digits = 2,
                          title = "Panel c: Unaffected Firms"),
-               file = "Table8.txt")
+               file = "analysis/output/Table8.txt")
 
 # Redo for latex output
 capture.output(stargazer(fs[,!c("Stkcd", "Struck", "Neighbor")],
@@ -163,9 +156,7 @@ capture.output(stargazer(fs[,!c("Stkcd", "Struck", "Neighbor")],
                          type='latex',
                          digits = 2,
                          title = "Panel c: Unaffected Firms"),
-               file = "Table8.tex")
+               file = "analysis/output/Table8.tex")
 
 ## Save temp data -----
-path_dir <- "~/R project/Code replication/analysis/temp"
-changeDir(path_dir)
-save.image("stats_summary.RData")
+save.image("analysis/temp/stats_summary.RData")

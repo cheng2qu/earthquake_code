@@ -4,19 +4,11 @@
 ## Setup -----
 # Load R-to-table output package
 
-# Set the working directory to access input data
-path_dir <- "~/R project/Code replication/analysis/input"
-changeDir(path_dir)
-
 # Empty workspace
 rm(list = ls())
 # Load prepared data
-source_data <- "data_build.RData"
+source_data <- "analysis/input/data_build.RData"
 load(source_data)
-
-# Set the working directory to output folder
-path_dir <- "~/R project/Code replication/analysis/output"
-changeDir(path_dir)
 
 ## Model 2, Table 3 Drifting affects -----
 # Aggregate close variable
@@ -66,7 +58,7 @@ capture.output(stargazer(fix1,da1,da2,da4,da8,da12,
                          df = FALSE,
                          add.lines = list(c("Controls","Yes","Yes","Yes","Yes","Yes","Yes"),
                                           c("FE","Yes","Yes","Yes","Yes","Yes","Yes"))),
-               file = "Table3.txt")
+               file = "analysis/output/Table3.txt")
 
 # Output as Latex form
 capture.output(stargazer(fix1,da1,da2,da4,da8,da12,
@@ -85,9 +77,7 @@ capture.output(stargazer(fix1,da1,da2,da4,da8,da12,
                          df = FALSE,
                          add.lines = list(c("Controls","Yes","Yes","Yes","Yes","Yes","Yes"),
                                           c("FE","Yes","Yes","Yes","Yes","Yes","Yes"))),
-               file = "Table3.tex")
+               file = "analysis/output/Table3.tex")
 
 ## Save temp data -----
-path_dir <- "~/R project/Code replication/analysis/temp"
-changeDir(path_dir)
-save.image("model2.RData")
+save.image("analysis/temp/model2.RData")

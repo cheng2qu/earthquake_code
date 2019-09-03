@@ -5,19 +5,11 @@
 # Load package for panel regression
 require(plm)
 
-# Set the working directory to access input data
-path_dir <- "~/R project/Code replication/analysis/input"
-changeDir(path_dir)
-
 # Empty workspace
 rm(list = ls())
 # Load prepared data
-source_data <- "data_build.RData"
+source_data <- "analysis/input/data_build.RData"
 load(source_data)
-
-# Set the working directory to output folder
-path_dir <- "~/R project/Code replication/analysis/output"
-changeDir(path_dir)
 
 ## Model 1, Table 1: Full sample -----
 ## Regression (1) full sample without control
@@ -76,7 +68,7 @@ capture.output(stargazer(fix1,fix2,fix3,fix4,fix5,
                          digits = 3,
                          df = FALSE,
                          add.lines = list(c("FE","Yes","Yes","Yes","Yes","Yes"))),
-               file = "Table1.txt")
+               file = "analysis/output/Table1.txt")
 
 # Output as Latex form
 capture.output(stargazer(fix1,fix2,fix3,fix4,fix5,
@@ -94,7 +86,7 @@ capture.output(stargazer(fix1,fix2,fix3,fix4,fix5,
                          digits = 3,
                          df = FALSE,
                          add.lines = list(c("FE","Yes","Yes","Yes","Yes","Yes"))),
-               file = "Table1.tex")
+               file = "analysis/output/Table1.tex")
 
 ## Model 1, Table 13: Overseas earthquake -----
 ## Regression (1) baseline
@@ -118,7 +110,7 @@ capture.output(stargazer(baseline, oversea,
                          keep = 1:6,
                          df = FALSE,
                          add.lines = list(c("FE","Yes","Yes"))),
-               file = "Table13.txt")
+               file = "analysis/output/Table13.txt")
 
 # Output as Latex form
 capture.output(stargazer(baseline, oversea,
@@ -137,7 +129,7 @@ capture.output(stargazer(baseline, oversea,
                          digits = 3,
                          df = FALSE,
                          add.lines = list(c("FE","Yes","Yes"))),
-               file = "Table13.tex")
+               file = "analysis/output/Table13.tex")
 
 ## Model 1, Table 2: regression by subgroups -----
 ## Panel A: regression by leverage subgroups
@@ -177,7 +169,7 @@ capture.output(stargazer(m11,m12,m13,m21,m22,m23,
                          digits = 3,
                          df = FALSE,
                          add.lines = list(c("FE","Yes","Yes","Yes","Yes","Yes","Yes"))),
-               file = "Table2.txt")
+               file = "analysis/output/Table2.txt")
 
 # Output as Latex form
 capture.output(stargazer(m11,m12,m13,m21,m22,m23,
@@ -195,7 +187,7 @@ capture.output(stargazer(m11,m12,m13,m21,m22,m23,
                          digits = 3,
                          df = FALSE,
                          add.lines = list(c("FE","Yes","Yes","Yes","Yes","Yes"))),
-               file = "Table2.tex")
+               file = "analysis/output/Table2.tex")
 
 ## Table 13: Regression by leverage x market cap subgroups
 m11 <- plm(I(Cash_p_1f*100) ~ I(Neighbor*Mag) + I(Struck*Mag)+I(OpIncome/TA) + Leverage + log(TA)
@@ -246,7 +238,7 @@ capture.output(stargazer(m11,m12,m13,m21,m22,m23,m31,m32,m33,
                          digits = 3,
                          df = FALSE,
                          add.lines = list(c("FE","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"))),
-               file = "Table13.txt")
+               file = "analysis/output/Table13.txt")
 
 # Output as Latex form
 capture.output(stargazer(m11,m12,m13,m21,m22,m23,m31,m32,m33,
@@ -266,10 +258,8 @@ capture.output(stargazer(m11,m12,m13,m21,m22,m23,m31,m32,m33,
                          digits = 3,
                          df = FALSE,
                          add.lines = list(c("FE","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"))),
-               file = "Table13.tex")
+               file = "analysis/output/Table13.tex")
 
 
 ## Save temp data -----
-path_dir <- "~/R project/Code replication/analysis/temp"
-changeDir(path_dir)
-save.image("model1.RData")
+save.image("analysis/temp/model1.RData")

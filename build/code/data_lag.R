@@ -1,15 +1,11 @@
 ## Create lagged and lead term for fs
 
 ## Setup -----
-# Set the working directory to access temp data
-setwd("~/R project/Code replication/build/temp")
-
 # Empty workspace
 rm(list = ls())
-# Set link to temp data
-source_data <- "data_split.RData"
+
 # Load filter data
-load(source_data)
+load("build/temp/data_split.RData")
 
 ## Lag-lead fs data -----
 # Order fs table
@@ -86,16 +82,10 @@ lsList <- ls()
 dropList <- c("addcols", "cols", "path_dir", "source_data")
 saveList <- lsList[!lsList %in% dropList]
 # Save data to temp
-save(list=saveList, file="data_build.RData")
+save(list=saveList, file="build/temp/data_build.RData")
 
 # Save data to output
-path_dir <- "~/R project/Code replication/build/output"
-changeDir(path_dir)
-# Save the data tables
-save(list=saveList, file="data_build.RData")
+save(list=saveList, file="build/output/data_build.RData")
 
 # Save data to analysis/input
-path_dir <- "~/R project/Code replication/analysis/input"
-changeDir(path_dir)
-# Save the data tables
-save(list=saveList, file="data_build.RData")
+save(list=saveList, file="analysis/input/data_build.RData")

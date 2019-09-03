@@ -4,19 +4,11 @@
 ## Setup -----
 # Load R-to-table output package
 
-# Set the working directory to access input data
-path_dir <- "~/R project/Code replication/analysis/input"
-changeDir(path_dir)
-
 # Empty workspace
 rm(list = ls())
 # Load prepared data
-source_data <- "data_build.RData"
+source_data <- "analysis/input/data_build.RData"
 load(source_data)
-
-# Set the working directory to output folder
-path_dir <- "~/R project/Code replication/analysis/output"
-changeDir(path_dir)
 
 # Table 14, Regression on cash holding -----
 fs2$Insurance_p[is.na(fs2$Insurance_p)] <-0
@@ -54,7 +46,7 @@ capture.output(stargazer(cashfs1,cashins1,cashfs2,cashins2,
                          digits = 3,
                          df = FALSE,
                          add.lines = list(c("FE","Yes","Yes","Yes","Yes"))),
-               file = "Table14.txt")
+               file = "analysis/output/Table14.txt")
 
 # Output as Latex form
 capture.output(stargazer(cashfs1,cashins1,cashfs2,cashins2,
@@ -71,9 +63,7 @@ capture.output(stargazer(cashfs1,cashins1,cashfs2,cashins2,
                          digits = 3,
                          df = FALSE,
                          add.lines = list(c("FE","Yes","Yes","Yes","Yes"))),
-               file = "Table14.tex")
+               file = "analysis/output/Table14.tex")
 
 ## Save temp data -----
-path_dir <- "~/R project/Code replication/analysis/temp"
-changeDir(path_dir)
-save.image("model5.RData")
+save.image("analysis/temp/model5.RData")

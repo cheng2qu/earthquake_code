@@ -4,13 +4,9 @@
 ## Setup -----
 # Empty workspace
 rm(list = ls())
-# Set the working directory to access temp data
-setwd("~/R project/Code replication/build/temp")
 
-# Set link to temp data
-source_data <- "data_pre_merge.RData"
 # Load filter data
-load(source_data)
+load("build/temp/data_pre_merge.RData")
 
 ## Merge tables -----
 # Merge fs with industry code
@@ -69,4 +65,4 @@ lsList <- ls()
 dropList <- c("company", "CPI", "Income", "Insurance", "n")
 saveList <- lsList[!lsList %in% dropList]
 # Save data to temp
-save(list=saveList, file="data_merged.RData")
+save(list=saveList, file="build/temp/data_merged.RData")

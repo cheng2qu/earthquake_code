@@ -1,1 +1,0 @@
-"C:\Users\cqu\Documents\R\R-3.5.3\bin\Rscript.exe" "C:\Users\cqu\Documents\R project\Code replication\runDirectory.R"

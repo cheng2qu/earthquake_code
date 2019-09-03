@@ -4,19 +4,11 @@
 ## Setup -----
 # Load R-to-table output package
 
-# Set the working directory to access input data
-path_dir <- "~/R project/Code replication/analysis/input"
-changeDir(path_dir)
-
 # Empty workspace
 rm(list = ls())
 # Load prepared data
-source_data <- "data_build.RData"
+source_data <- "analysis/input/data_build.RData"
 load(source_data)
-
-# Set the working directory to output folder
-path_dir <- "~/R project/Code replication/analysis/output"
-changeDir(path_dir)
 
 ## Model 3, Table 4 learning effects -----
 # Previous experience
@@ -64,7 +56,7 @@ capture.output(stargazer(fix1,ex,ex2,ex3,
                          df = FALSE,
                          add.lines = list(c("Controls","Yes","Yes","Yes","Yes"),
                                           c("FE","Yes","Yes","Yes","Yes"))),
-               file = "Table4.txt")
+               file = "analysis/output/Table4.txt")
 
 # Output as Latex form
 capture.output(stargazer(fix1,ex,ex2,ex3,
@@ -83,9 +75,7 @@ capture.output(stargazer(fix1,ex,ex2,ex3,
                          df = FALSE,
                          add.lines = list(c("Controls","Yes","Yes","Yes","Yes","Yes","Yes"),
                                           c("FE","Yes","Yes","Yes","Yes","Yes","Yes"))),
-               file = "Table4.tex")
+               file = "analysis/output/Table4.tex")
 
 ## Save temp data -----
-path_dir <- "~/R project/Code replication/analysis/temp"
-changeDir(path_dir)
-save.image("model3.RData")
+save.image("analysis/temp/model3.RData")

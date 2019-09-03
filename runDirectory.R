@@ -1,39 +1,34 @@
 ## Script to run all steps in order -----
 
 ## Empty temp folders -----
-temp_dir <- "~/R project/Code replication/build/temp/"
-setwd(temp_dir)
-file.remove(file.path(temp_dir), list.files(temp_dir))
+temp_dir <- "build/temp/"
+file.remove(paste0(temp_dir,list.files(temp_dir)))
 
-temp_dir <- "~/R project/Code replication/build/output/"
-setwd(temp_dir)
-file.remove(file.path(temp_dir), list.files(temp_dir))
+temp_dir <- "analysis/temp/"
+file.remove(paste0(temp_dir,list.files(temp_dir)))
 
-temp_dir <- "~/R project/Code replication/analysis/temp/"
-setwd(temp_dir)
-file.remove(file.path(temp_dir), list.files(temp_dir))
+## Empty output folders -----
+temp_dir <- "build/output/"
+file.remove(paste0(temp_dir,list.files(temp_dir)))
 
-temp_dir <- "~/R project/Code replication/analysis/output/"
-setwd(temp_dir)
-file.remove(file.path(temp_dir), list.files(temp_dir))
+temp_dir <- "analysis/output/"
+file.remove(paste0(temp_dir,list.files(temp_dir)))
 
 ## Run scripts in build part -----
-fileDir <- "~/R project/Code replication/build/code/"
 fileList <- c("data_filter.R",
               "data_merge.R",
               "data_treatment.R",
               "data_split.R",
               "data_lag.R")
-filePath <- paste0(fileDir, fileList)
+filePath <- paste0("build/code/", fileList)
 lapply(filePath, source)
 
 ## Run scripts in analysis part -----
-fileDir <- "~/R project/Code replication/analysis/code/"
 fileList <- c("stats_summary.R",
               "model1.R",
               "model2.R",
               "model3.R",
               "model4.R",
               "model5.R")
-filePath <- paste0(fileDir,fileList)
+filePath <- paste0("analysis/code/", fileList)
 lapply(filePath, source)

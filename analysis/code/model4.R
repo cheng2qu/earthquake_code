@@ -4,19 +4,11 @@
 ## Setup -----
 # Load R-to-table output package
 
-# Set the working directory to access input data
-path_dir <- "~/R project/Code replication/analysis/input"
-changeDir(path_dir)
-
 # Empty workspace
 rm(list = ls())
 # Load prepared data
-source_data <- "data_build.RData"
+source_data <- "analysis/input/data_build.RData"
 load(source_data)
-
-# Set the working directory to output folder
-path_dir <- "~/R project/Code replication/analysis/output"
-changeDir(path_dir)
 
 # Model 4. Dividend---------------------------------
 
@@ -104,19 +96,19 @@ didSample <- function(repN, output.file){
                            rownames = FALSE,
                            type = "text",
                            digits = 3),
-                 file = "Table5.txt")
+                 file = "analysis/output/Table5.txt")
   capture.output(stargazer(didTable,
                            summary = FALSE,
                            colnames = TRUE,
                            rownames = FALSE,
                            type = "latex",
                            digits = 3),
-                 file = "Table5.tex")
+                 file = "analysis/output/Table5.tex")
   
 }
 
 # Call function 
-didSample(repN = 10, output.file = "Diff-in-Diff.txt")
+didSample(repN = 10, output.file = "analysis/output/Diff-in-Diff.txt")
 
 # Narrower interval for quantiles
 probs <- c(0,0.1, 0.3, 0.5,0.7, 0.9)
@@ -129,9 +121,7 @@ fs[, c("quanTA","quanOI","quanLev", "quanCash_p") :=
    by = "Accper"]
 
 # Match by Acceper, TA, leverage, cash holding quantile, and general industrial code
-didSample(repN = 10, output.file = "Diff-in-Diff_narrower.txt")
+didSample(repN = 10, output.file = "analysis/output/Diff-in-Diff_narrower.txt")
 
 ## Save temp data -----
-path_dir <- "~/R project/Code replication/analysis/temp"
-changeDir(path_dir)
-save.image("model4.RData")
+save.image("analysis/temp/model4.RData")
