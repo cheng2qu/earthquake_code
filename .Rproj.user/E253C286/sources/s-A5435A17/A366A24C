@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1566436179781.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "A366A24C",
+    "lastKnownWriteTime" : 1566905977,
+    "last_content_update" : 1566905977627,
+    "path" : "~/R project/Code replication/runDirectory.R",
+    "project_path" : "runDirectory.R",
+    "properties" : {
+        "cursorPosition" : "27,32",
+        "scrollLine" : "4",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
