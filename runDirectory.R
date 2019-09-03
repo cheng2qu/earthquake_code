@@ -1,11 +1,11 @@
-## Script to run all steps in order
+## Script to run all steps in order -----
 
-## Empty temp folders
+## Empty temp folders -----
 temp_dir <- "~/R project/Code replication/build/temp/"
 setwd(temp_dir)
 file.remove(file.path(temp_dir), list.files(temp_dir))
 
-temp_dir <- "~/R project/Code replication/analysis/output/"
+temp_dir <- "~/R project/Code replication/build/output/"
 setwd(temp_dir)
 file.remove(file.path(temp_dir), list.files(temp_dir))
 
@@ -13,7 +13,11 @@ temp_dir <- "~/R project/Code replication/analysis/temp/"
 setwd(temp_dir)
 file.remove(file.path(temp_dir), list.files(temp_dir))
 
-## Run scripts in build part
+temp_dir <- "~/R project/Code replication/analysis/output/"
+setwd(temp_dir)
+file.remove(file.path(temp_dir), list.files(temp_dir))
+
+## Run scripts in build part -----
 fileDir <- "~/R project/Code replication/build/code/"
 fileList <- c("data_filter.R",
               "data_merge.R",
@@ -23,7 +27,7 @@ fileList <- c("data_filter.R",
 filePath <- paste0(fileDir, fileList)
 lapply(filePath, source)
 
-## Run scripts in analysis part
+## Run scripts in analysis part -----
 fileDir <- "~/R project/Code replication/analysis/code/"
 fileList <- c("stats_summary.R",
               "model1.R",
